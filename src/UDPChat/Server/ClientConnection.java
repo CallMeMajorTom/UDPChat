@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class ClientConnection {
 	
-	static double TRANSMISSION_FAILURE_RATE = 0;
+	static double TRANSMISSION_FAILURE_RATE = 0.3;
 	
 	private final String  m_name;
 	private final InetAddress m_address;
@@ -38,15 +38,11 @@ public class ClientConnection {
     	byte[] buf = new byte[256];
     	buf = message.getBytes();
     	DatagramPacket packet = new DatagramPacket(buf, buf.length,m_address,m_port);
-    	for(i = 0;i < 3; i++){//send the message at most 3 times
-    		if(failure > TRANSMISSION_FAILURE_RATE){
-    			socket.send(packet);
-    			break;
-         	}
-    		System.out.println("Send "+ i+1 +" times");
+    	while(failure < TRANSMISSION_FAILURE_RATE) {
     		failure = generator.nextDouble();
+    		System.out.println("Send "+(i++)+" times");
     	}
-    	if(i == 3) System.out.println("Message got lost");
+    		socket.send(packet);
 
 	}
  

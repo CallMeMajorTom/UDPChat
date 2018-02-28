@@ -85,15 +85,12 @@ public class ServerConnection {
 		// TODO: 
 		// * marshal message if necessary
 		// * send a chat message to the server
-    	for(i = 0;i < 3; i++){//send the message for 3 times
-    		if(failure > TRANSMISSION_FAILURE_RATE){
-    			m_socket.send(packet);
-    			break;
-        	}
-    		 
+    	while(failure < TRANSMISSION_FAILURE_RATE) {
     		failure = generator.nextDouble();
+    		System.out.println("Send "+(i++)+" times");
     	}
-    	if(i == 3) System.out.println("Message got lost");
+    	System.out.println("Send Success");
+    	m_socket.send(packet); 
     }
 
 }

@@ -130,6 +130,20 @@ public class Server {
 	    	    }  	
 	    }
 	    }
+	    else if(seperated[0].equalsIgnoreCase("/disconnect")){//disconnect(Display in everyone's GUI)
+	    	//The format:TheNameOfLeaver leave
+	    	String leave_m = seperated[1] + " disconnect";
+	    	broadcast(leave_m);//inform everyone
+	    	ClientConnection c;
+	    	//Remove it from the ArrayList
+	    	for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
+	    	    c = itr.next(); 
+	    	    if(c.getName().equals(seperated[1])){
+	    	    	m_connectedClients.remove(c);
+	    	    	break; 
+	    	    }  	
+	    }
+	    }
 	    else{//The Wrong Commond
 	    	String wrong_m = "You sent wrong Commond";
 	    	sendPrivateMessage(wrong_m,seperated[seperated.length-1]);//Inform the Sender

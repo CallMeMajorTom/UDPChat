@@ -32,8 +32,17 @@ public class Client implements ActionListener {
 	m_name = userName;
 	// Start up GUI (runs in its own thread)
 	m_GUI = new ChatGUI(this, m_name);
+	m_GUI.addWindowListener(new WindowAdapter(){
+		public void windowClosing(WindowEvent e){
+			try {
+				m_connection.sendChatMessage("/disconnect",m_name);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}}});
     }
-
+    
+    
     private void connectToServer(String hostName, int port) throws IOException {
 	//Create a new server connection
     m_connection = new ServerConnection(hostName, port);
