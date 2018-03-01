@@ -1,20 +1,14 @@
 package UDPChat.Client;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.io.*;
-import java.lang.Thread;
+
+//import java.io.*;
 
 
 public class Client implements ActionListener {
 
     private String m_name = null;
-    private Thread Heartbeat = null;
-
-    private ChatGUI m_GUI = null;
+    private final ChatGUI m_GUI;
     private ServerConnection m_connection = null;
 
     public static void main(String[] args) throws IOException {
@@ -44,7 +38,6 @@ public class Client implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}}});
-
     }
     
     
@@ -52,25 +45,6 @@ public class Client implements ActionListener {
 	//Create a new server connection
     m_connection = new ServerConnection(hostName, port);
 	if(m_connection.handshake(m_name)) {
-        Heartbeat = new Thread(
-                new Runnable(){
-                    public void run(){
-                        while (true) {
-                            try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                            try {
-                                m_connection.sendChatMessage("\r\n",m_name);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }
-                });
-        Heartbeat.start();
 	    listenForServerMessages();
 	}
 	else {//if the name is same, shutdown the GUI
@@ -78,7 +52,6 @@ public class Client implements ActionListener {
 	    m_GUI.shutdown();
 	}
     }
-
 
     private void listenForServerMessages() throws IOException {
 	// Use the code below once m_connection.receiveChatMessage() has been implemented properly.

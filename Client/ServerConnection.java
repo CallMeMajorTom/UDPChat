@@ -5,11 +5,7 @@
 package UDPChat.Client;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Random;
 
 /**
@@ -24,7 +20,6 @@ public class ServerConnection {
     private DatagramSocket m_socket = null;
     private InetAddress m_serverAddress = null;
     private int m_serverPort = -1;
-    private Thread detect = null;
 
     public ServerConnection(String hostName, int port) throws SocketException, UnknownHostException {
 	m_serverPort = port;
@@ -34,6 +29,7 @@ public class ServerConnection {
 	// * set up socket and assign it to m_socket
 		m_serverAddress = InetAddress.getByName(hostName);
 		m_socket = new DatagramSocket();
+	    m_socket.setSoTimeout(100000);
     }
 
     public boolean handshake(String name) throws IOException {

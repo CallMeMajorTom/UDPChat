@@ -8,10 +8,10 @@ package UDPChat.Server;
 //
 
 import java.io.IOException;
-import java.net.*;
-//import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+//import java.io.*;
 
 public class Server {
 	
@@ -120,45 +120,36 @@ public class Server {
 	    	//The format:TheNameOfLeaver leave
 	    	String leave_m = seperated[1] + " leave";
 	    	broadcast(leave_m);//inform everyone
-	    	remove(seperated[1]);
+	    	ClientConnection c;
+	    	//Remove it from the ArrayList
+	    	for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
+	    	    c = itr.next(); 
+	    	    if(c.getName().equals(seperated[1])){
+	    	    	m_connectedClients.remove(c);
+	    	    	break; 
+	    	    }  	
+	    }
 	    }
 	    else if(seperated[0].equalsIgnoreCase("/disconnect")){//disconnect(Display in everyone's GUI)
 	    	//The format:TheNameOfLeaver leave
 	    	String leave_m = seperated[1] + " disconnect";
 	    	broadcast(leave_m);//inform everyone
-	    	remove(seperated[1]);
+	    	ClientConnection c;
+	    	//Remove it from the ArrayList
+	    	for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
+	    	    c = itr.next(); 
+	    	    if(c.getName().equals(seperated[1])){
+	    	    	m_connectedClients.remove(c);
+	    	    	break; 
+	    	    }  	
 	    }
-	    else if(seperated[0].equalsIgnoreCase("\r\n")){
-			find(seperated[1]).count = 0;
-		}
+	    }
 	    else{//The Wrong Commond
 	    	String wrong_m = "You sent wrong Commond";
 	    	sendPrivateMessage(wrong_m,seperated[seperated.length-1]);//Inform the Sender
 	    }
 	} while (true);
-    }
-
-    public void remove(String name){
-		ClientConnection c;
-		for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
-			c = itr.next();
-			if(c.getName().equals(name)){
-				m_connectedClients.remove(c);
-				break;
-			}
-		}
-	}
-
-    public ClientConnection find(String name){
-		ClientConnection c = null;
-		for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
-			c = itr.next();
-			if(c.hasName(name)) {
-				return c; // Already exists a client with this name
-			}
-		}
-		return c;
-	}
+    } 
 
     public boolean addClient(String name, InetAddress address, int port) {
 	ClientConnection c;
@@ -168,15 +159,12 @@ public class Server {
 		return false; // Already exists a client with this name
 	    }
 	}
-	c = null;
-	c = new ClientConnection(name, address, port,this);
-	m_connectedClients.add(c);
-	c.detect.start();
+	m_connectedClients.add(new ClientConnection(name, address, port));
 	return true;
     }
 
     public boolean sendPrivateMessage(String message, String name) throws IOException {
-	ClientConnection c;
+	ClientConnection c; 
 	for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
 	    c = itr.next();
 	    if(c.hasName(name)) {
