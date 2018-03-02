@@ -121,15 +121,11 @@ public class Server {
 	    	String leave_m = seperated[1] + " leave";
 	    	broadcast(leave_m);//inform everyone
 	    	remove(seperated[1]);
+
 	    }
-	    else if(seperated[0].equalsIgnoreCase("/disconnect")){//disconnect(Display in everyone's GUI)
-	    	//The format:TheNameOfLeaver leave
-	    	String leave_m = seperated[1] + " disconnect";
-	    	broadcast(leave_m);//inform everyone
-	    	remove(seperated[1]);
-	    }
-	    else if(seperated[0].equalsIgnoreCase("\r\n")){
-			find(seperated[1]).count = 0;
+	    else if(seperated[0].equalsIgnoreCase("\r\n")){//Heartbeat packet, clear the timer
+			if(find(seperated[1]) != null)
+				find(seperated[1]).count = 0;
 		}
 	    else{//The Wrong Commond
 	    	String wrong_m = "You sent wrong Commond";
@@ -138,15 +134,16 @@ public class Server {
 	} while (true);
     }
 
-    public void remove(String name){
+    public boolean remove(String name){
 		ClientConnection c;
 		for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
 			c = itr.next();
 			if(c.getName().equals(name)){
 				m_connectedClients.remove(c);
-				break;
+				return true;
 			}
 		}
+		return false;
 	}
 
     public ClientConnection find(String name){
@@ -154,7 +151,7 @@ public class Server {
 		for(Iterator<ClientConnection> itr = m_connectedClients.iterator(); itr.hasNext();) {
 			c = itr.next();
 			if(c.hasName(name)) {
-				return c; // Already exists a client with this name
+				return c;
 			}
 		}
 		return c;

@@ -17,7 +17,7 @@ public class Client implements ActionListener {
     private ChatGUI m_GUI = null;
     private ServerConnection m_connection = null;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Throwable {
 	if(args.length < 3) {
 	    System.err.println("Usage: java Client serverhostname serverportnumber username");
 	    System.exit(-1);
@@ -36,22 +36,23 @@ public class Client implements ActionListener {
 	m_name = userName;
 	// Start up GUI (runs in its own thread)
 	m_GUI = new ChatGUI(this, m_name);
-	m_GUI.addWindowListener(new WindowAdapter(){
+	/*m_GUI.addWindowListener(new WindowAdapter(){
 		public void windowClosing(WindowEvent e){
 			try {
 				m_connection.sendChatMessage("/disconnect",m_name);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}}});
+			}}});*/
 
     }
     
     
-    private void connectToServer(String hostName, int port) throws IOException {
+    private void connectToServer(String hostName, int port) throws Throwable {
 	//Create a new server connection
     m_connection = new ServerConnection(hostName, port);
 	if(m_connection.handshake(m_name)) {
+	    //Start the Thread to send Heartbeat
         Heartbeat = new Thread(
                 new Runnable(){
                     public void run(){
@@ -71,6 +72,7 @@ public class Client implements ActionListener {
                     }
                 });
         Heartbeat.start();
+        //Start to listen for server message
 	    listenForServerMessages();
 	}
 	else {//if the name is same, shutdown the GUI
@@ -80,13 +82,18 @@ public class Client implements ActionListener {
     }
 
 
-    private void listenForServerMessages() throws IOException {
+    private void listenForServerMessages() throws Throwable {
 	// Use the code below once m_connection.receiveChatMessage() has been implemented properly.
     // If it is a [leave] message, shut down the leave one's GUI.
     // otherwise, just display it.
 	do {
 		String tmp = m_connection.receiveChatMessage();
-		if(tmp.equalsIgnoreCase(m_name+" leave")) m_GUI.shutdown();
+		if(tmp.equalsIgnoreCase(m_name+" leave")){
+
+		    m_GUI.dispose();
+		    Heartbeat.stop();
+		    System.exit(1);
+        }
 		m_GUI.displayMessage(tmp);
 	} while(true);
     }

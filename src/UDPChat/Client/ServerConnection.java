@@ -34,6 +34,7 @@ public class ServerConnection {
 	// * set up socket and assign it to m_socket
 		m_serverAddress = InetAddress.getByName(hostName);
 		m_socket = new DatagramSocket();
+		m_socket.setSoTimeout(200000);
     }
 
     public boolean handshake(String name) throws IOException {
@@ -85,12 +86,14 @@ public class ServerConnection {
 		// TODO: 
 		// * marshal message if necessary
 		// * send a chat message to the server
-    	while(failure < TRANSMISSION_FAILURE_RATE) {
-    		failure = generator.nextDouble();
-    		System.out.println("Send "+(i++)+" times");
-    	}
-    	System.out.println("Send Success");
-    	m_socket.send(packet); 
+		for(i = 0;i < 5; i++){//send the message for 5 times
+			if(failure > TRANSMISSION_FAILURE_RATE){
+				m_socket.send(packet);
+				break;
+			};
+			failure = generator.nextDouble();
+		}
+		if(i == 5) System.out.println("Message got lost");
     }
 
 }

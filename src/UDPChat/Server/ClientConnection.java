@@ -42,12 +42,14 @@ public class ClientConnection {
                                 e.printStackTrace();
                             }
 						}
-						    m_server.remove(m_name);
-                        try {
-                            m_server.broadcast(m_name+" disconnect");
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if(m_server.remove(m_name)) {
+                            try {
+                                m_server.broadcast("Can't detect the heartbeat of " + m_name + " !disconnect!");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
+
                     }
 				});
 	}
@@ -61,11 +63,14 @@ public class ClientConnection {
     	byte[] buf = new byte[256];
     	buf = message.getBytes();
     	DatagramPacket packet = new DatagramPacket(buf, buf.length,m_address,m_port);
-    	while(failure < TRANSMISSION_FAILURE_RATE) {
-    		failure = generator.nextDouble();
-    		System.out.println("Send "+(i++)+" times");
-    	}
-    		socket.send(packet);
+        for(i = 0;i < 5; i++){//send the message for 5 times
+            if(failure > TRANSMISSION_FAILURE_RATE){
+                socket.send(packet);
+                break;
+            }
+            failure = generator.nextDouble();
+        }
+        if(i == 5) System.out.println("Message got lost");
 
 	}
  
